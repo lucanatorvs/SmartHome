@@ -7,6 +7,18 @@ Running on a raspberry pi, this is a custom smart home deployment using the [Hom
 you need a .env file with the following variables:
 
 
+running codker containers chould be:
+
+- [HomeAssistant](https://hub.docker.com/r/homeassistant/home-assistant)
+- [Influxdb](https://hub.docker.com/_/influxdb)
+- [Grafana](https://hub.docker.com/r/grafana/grafana)
+- [Mosquitto](https://hub.docker.com/_/eclipse-mosquitto)
+- [Speedtest](https://hub.docker.com/r/robinmanuelthiel/speedtest)
+- [Zigbee2mqtt](https://hub.docker.com/r/koenkk/zigbee2mqtt)
+- [Node-Red](https://hub.docker.com/r/nodered/node-red)
+- mqtt-bridge, see docker file 
+- [Portainer](https://hub.docker.com/r/portainer/portainer-ce)
+
 ## todo
 
 - Create a docker compose file to deploy the home assistant instance and other components, such as a mqtt broker, Influxdb databace, Grafana and node-red.

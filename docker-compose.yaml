@@ -1,8 +1,145 @@
 version: '3'
+
+
 services:
-  # HomeAssistant  
-  # Mosquitto
+  # HomeAssistant
+  homeassistant:
+    image: homeassistant/home-assistant
+    container_name: HomeAssistant
+    volumes:
+      - ${SmartHomeDir}/homeassistant/config:/config
+      - /etc/localtime:/etc/localtime:ro
+    network_mode: host
+    depends_on:
+      - Mosquitto
+    restart: unless-stopped
+
   # Influxdb
+  influxdb:
+    image: influxdb:1.7
+    container_name: Influxdb
+
+
+
+    ports:
+      - 8086:8086
+    volumes:
+      - ${SmartHomeDir}/influxdb:/var/lib/influxdb
+    restart: unless-stopped
+
   # Grafana
+  grafana:
+    image: grafana/grafana:5.4.3
+    container_name: Grafana
+
+
+
+    depends_on:
+      - influxdb
+    ports:
+      - 3000:3000
+    volumes:
+      - ${DATA_DIR}/grafana:/var/lib/grafana
+    restart: unless-stopped
+    
+  # Mosquitto
+  mosquitto:
+    image: eclipse-mosquitto:1.5
+    container_name: Mosquitto
+
+
+
+    ports:
+      - 1883:1883
+    volumes:
+      - ../01-mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ../01-mosquitto/users:/mosquitto/config/users
+      - ${DATA_DIR}/mosquitto/data:/mosquitto/data
+      - ${DATA_DIR}/mosquitto/log:/mosquitto/log
+    restart: unless-stopped
+
+  # Speedtest
+  speedtest:
+    image: robinmanuelthiel/speedtest:latest
+    container_name: Speedtest
+
+
+
+    environment:
+      - LOOP=true
+      - LOOP_DELAY=1800
+      - DB_SAVE=true
+      - DB_HOST=http://influxdb:8086
+      - DB_NAME=speedtest
+      - DB_USERNAME=admin
+      - DB_PASSWORD=password
+    privileged: true # Needed for 'sleep' in the loop
+    depends_on:
+      - influxdb
+    restart: unless-stopped
+
+  # Zigbee2mqtt
+  zigbee2mqtt:
+    image: koenkk/zigbee2mqtt
+    container_name: zigbee2mqtt
+
+
+
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+      - /run/udev:/run/udev:ro
+    ports:
+      # Frontend port
+      - 8080:8080
+    environment:
+      - TZ=Europe/Amsterdam
+    devices:
+      # Make sure this matched your adapter location
+      - /dev/ttyAMA0:/dev/ttyACM0
+    depends_on:
+      - Mosquitto
+  
   # Node-Red
-  # speedtest
+  nodered:
+    image: nodered/node-red
+    container_name: nodered
+    ports:
+      - 1880:1880
+    volumes:
+      - /home/lucavanstraaten/SmartHome/nodered/data:/data
+    
+
+    restart: unless-stopped
+    environment:
+      - NODE_RED_USERNAME=admin
+      - NODE_RED_PASSWORD=password
+    depends_on:
+      - Mosquitto
+
+  # mqtt-bridge
+  mqttbridge:
+    build: #path to dockerfile
+    image: iothon/mqttbridge
+    container_name: mqttbridge
+    restart: unless-stopped
+
+  # Portainer
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 9000:9000
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${DATA_DIR}/portainer/data:/data
+    depends_on:
+      - Mosquitto
+    environment:
+      - PORT=9000
+      - HOST=
+    restart: unless-stopped
+
