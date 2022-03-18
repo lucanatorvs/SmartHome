@@ -1,0 +1,8 @@
+version: '3'
+services:
+  # HomeAssistant  
+  # Mosquitto
+  # Influxdb
+  # Grafana
+  # Node-Red
+  # speedtest
