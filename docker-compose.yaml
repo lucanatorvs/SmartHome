@@ -16,63 +16,60 @@ services:
 
   # Influxdb
   influxdb:
-    image: influxdb:1.7
+    image: influxdb:2.1
     container_name: Influxdb
-
-
-
     ports:
+      - 8083:8083
       - 8086:8086
     volumes:
       - ${SmartHomeDir}/influxdb:/var/lib/influxdb
+    environment:
+      - INFLUXDB_ADMIN_USER=${username}
+      - INFLUXDB_ADMIN_PASSWORD=${password}
+      - INFLUXDB_DB="speedtest"
+      - INFLUXDB_DB="homeassistant"
     restart: unless-stopped
 
   # Grafana
   grafana:
     image: grafana/grafana:5.4.3
     container_name: Grafana
-
-
-
-    depends_on:
-      - influxdb
     ports:
       - 3000:3000
     volumes:
-      - ${DATA_DIR}/grafana:/var/lib/grafana
+      - ${SmartHomeDir}/grafana:/var/lib/grafana
+    depends_on:
+      - influxdb
     restart: unless-stopped
     
   # Mosquitto
   mosquitto:
-    image: eclipse-mosquitto:1.5
+    image: eclipse-mosquitto:2.0
     container_name: Mosquitto
-
-
-
     ports:
       - 1883:1883
     volumes:
-      - ../01-mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
-      - ../01-mosquitto/users:/mosquitto/config/users
-      - ${DATA_DIR}/mosquitto/data:/mosquitto/data
-      - ${DATA_DIR}/mosquitto/log:/mosquitto/log
+      - ${SmartHomeDir}/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ${SmartHomeDir}/mosquitto/users:/mosquitto/config/users
+      - ${SmartHomeDir}/mosquitto/data:/mosquitto/data
+      - ${SmartHomeDir}/mosquitto/log:/mosquitto/log
+    environment:
+      - MQTT_USERNAME=${username}
+      - MQTT_PASSWORD=${password}
     restart: unless-stopped
 
   # Speedtest
   speedtest:
     image: robinmanuelthiel/speedtest:latest
     container_name: Speedtest
-
-
-
     environment:
       - LOOP=true
       - LOOP_DELAY=1800
       - DB_SAVE=true
       - DB_HOST=http://influxdb:8086
       - DB_NAME=speedtest
-      - DB_USERNAME=admin
-      - DB_PASSWORD=password
+      - DB_USERNAME=${username}
+      - DB_PASSWORD=${password}
     privileged: true # Needed for 'sleep' in the loop
     depends_on:
       - influxdb
@@ -82,16 +79,12 @@ services:
   zigbee2mqtt:
     image: koenkk/zigbee2mqtt
     container_name: zigbee2mqtt
-
-
-
-    restart: unless-stopped
-    volumes:
-      - ./data:/app/data
-      - /run/udev:/run/udev:ro
     ports:
       # Frontend port
       - 8080:8080
+    volumes:
+      - ${SmartHomeDir}/Zigbee2mqtt:/app/data
+      - /run/udev:/run/udev:ro
     environment:
       - TZ=Europe/Amsterdam
     devices:
@@ -99,6 +92,7 @@ services:
       - /dev/ttyAMA0:/dev/ttyACM0
     depends_on:
       - Mosquitto
+    restart: unless-stopped
   
   # Node-Red
   nodered:
@@ -107,21 +101,23 @@ services:
     ports:
       - 1880:1880
     volumes:
-      - /home/lucavanstraaten/SmartHome/nodered/data:/data
-    
-
-    restart: unless-stopped
+      - ${SmartHomeDir}/nodered:/data
     environment:
       - NODE_RED_USERNAME=admin
       - NODE_RED_PASSWORD=password
     depends_on:
-      - Mosquitto
+      - mosquitto
+      - homeassistant
+      - influxdb
+    restart: unless-stopped
 
   # mqtt-bridge
   mqttbridge:
-    build: #path to dockerfile
-    image: iothon/mqttbridge
+    build: ${SmartHomeDir}/mqtt2influxdb_bridge/Dockerfile
     container_name: mqttbridge
+    depends_on:
+      - mosquitto
+      - influxdb
     restart: unless-stopped
 
   # Portainer
@@ -135,7 +131,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${DATA_DIR}/portainer/data:/data
+      - ${SmartHomeDir}/portainer:/data
     depends_on:
       - Mosquitto
     environment:
