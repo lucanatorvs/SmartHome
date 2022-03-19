@@ -113,7 +113,7 @@ services:
 
   # mqtt-bridge
   mqttbridge:
-    build: ${SmartHomeDir}/mqtt2influxdb_bridge/Dockerfile
+    build: ${SmartHomeDir}/mqtt2influxdb_bridge
     container_name: mqttbridge
     depends_on:
       - mosquitto

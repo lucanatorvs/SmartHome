@@ -4,6 +4,7 @@
 
 This script receives MQTT data and saves those to InfluxDB.
 
+by Gautier MECHLING, Nilhcem
 """
 
 import re
@@ -17,13 +18,13 @@ import time
 INFLUXDB_ADDRESS = 'influxdb'
 INFLUXDB_USER = 'admin'
 INFLUXDB_PASSWORD = 'admin'
-INFLUXDB_DATABASE = 'iothon_db'
+INFLUXDB_DATABASE = 'homedata'
 
 MQTT_ADDRESS = 'mosquitto'
 MQTT_USER = 'admin'
 MQTT_PASSWORD = 'admin'
-MQTT_TOPIC = 'iothon/+/+'  # [bme280|mijia]/[temperature|humidity|battery|status]
-MQTT_REGEX = 'iothon/([^/]+)/([^/]+)'
+MQTT_TOPIC = 'home/+/+'  # [bme280|mijia]/[temperature|humidity|battery|status]
+MQTT_REGEX = 'home/([^/]+)/([^/]+)'
 MQTT_CLIENT_ID = 'MQTTInfluxDBBridge'
 
 influxdb_client = InfluxDBClient(INFLUXDB_ADDRESS, 8086, INFLUXDB_USER, INFLUXDB_PASSWORD, None)
