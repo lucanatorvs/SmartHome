@@ -11,12 +11,12 @@ services:
       - /etc/localtime:/etc/localtime:ro
     network_mode: host
     depends_on:
-      - Mosquitto
+      - mosquitto
     restart: unless-stopped
 
   # Influxdb
   influxdb:
-    image: influxdb:2.1
+    image: arm32v7/influxdb:latest
     container_name: Influxdb
     ports:
       - 8083:8083
@@ -91,7 +91,7 @@ services:
       # Make sure this matched your adapter location
       - /dev/ttyAMA0:/dev/ttyACM0
     depends_on:
-      - Mosquitto
+      - mosquitto
     restart: unless-stopped
   
   # Node-Red
@@ -133,7 +133,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${SmartHomeDir}/portainer:/data
     depends_on:
-      - Mosquitto
+      - mosquitto
     environment:
       - PORT=9000
       - HOST=
