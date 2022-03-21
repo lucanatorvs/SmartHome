@@ -83,7 +83,7 @@ services:
       # Frontend port
       - 8080:8080
     volumes:
-      - ${SmartHomeDir}/Zigbee2mqtt:/app/data
+      - ${SmartHomeDir}/zigbee2mqtt:/app/data
       - /run/udev:/run/udev:ro
     environment:
       - TZ=Europe/Amsterdam
