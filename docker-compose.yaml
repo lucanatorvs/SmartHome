@@ -1,11 +1,12 @@
 version: '3'
 
-
 services:
   # HomeAssistant
   homeassistant:
     image: homeassistant/home-assistant
     container_name: HomeAssistant
+    # ports:
+    #   - 8123:8123
     volumes:
       - ${SmartHomeDir}/homeassistant/config:/config
       - /etc/localtime:/etc/localtime:ro
@@ -34,6 +35,7 @@ services:
   grafana:
     image: grafana/grafana:5.4.3
     container_name: Grafana
+    user: "0"
     ports:
       - 3000:3000
     volumes:
@@ -53,47 +55,11 @@ services:
       - ${SmartHomeDir}/mosquitto/users:/mosquitto/config/users
       - ${SmartHomeDir}/mosquitto/data:/mosquitto/data
       - ${SmartHomeDir}/mosquitto/log:/mosquitto/log
-    environment:
-      - MQTT_USERNAME=${username}
-      - MQTT_PASSWORD=${password}
+    # environment:
+    #   - MQTT_USERNAME=${username}
+    #   - MQTT_PASSWORD=${password}
     restart: unless-stopped
 
-  # Speedtest
-  speedtest:
-    image: robinmanuelthiel/speedtest:latest
-    container_name: Speedtest
-    environment:
-      - LOOP=true
-      - LOOP_DELAY=1800
-      - DB_SAVE=true
-      - DB_HOST=http://influxdb:8086
-      - DB_NAME=speedtest
-      - DB_USERNAME=${username}
-      - DB_PASSWORD=${password}
-    privileged: true # Needed for 'sleep' in the loop
-    depends_on:
-      - influxdb
-    restart: unless-stopped
-
-  # Zigbee2mqtt
-  zigbee2mqtt:
-    image: koenkk/zigbee2mqtt
-    container_name: zigbee2mqtt
-    ports:
-      # Frontend port
-      - 8080:8080
-    volumes:
-      - ${SmartHomeDir}/zigbee2mqtt:/app/data
-      - /run/udev:/run/udev:ro
-    environment:
-      - TZ=Europe/Amsterdam
-    devices:
-      # Make sure this matched your adapter location
-      - /dev/ttyAMA0:/dev/ttyACM0
-    depends_on:
-      - mosquitto
-    restart: unless-stopped
-  
   # Node-Red
   nodered:
     image: nodered/node-red
@@ -110,16 +76,7 @@ services:
       - homeassistant
       - influxdb
     restart: unless-stopped
-
-  # mqtt-bridge
-  mqttbridge:
-    build: ${SmartHomeDir}/mqtt2influxdb_bridge
-    container_name: mqttbridge
-    depends_on:
-      - mosquitto
-      - influxdb
-    restart: unless-stopped
-
+  
   # Portainer
   portainer:
     image: portainer/portainer-ce:latest
@@ -139,3 +96,47 @@ services:
       - HOST=
     restart: unless-stopped
 
+  # # mqtt-bridge
+  # mqttbridge:
+  #   build: ${SmartHomeDir}/mqtt2influxdb_bridge
+  #   container_name: mqttbridge
+  #   depends_on:
+  #     - mosquitto
+  #     - influxdb
+  #   restart: unless-stopped
+
+  # # Speedtest
+  # speedtest:
+  #   image: robinmanuelthiel/speedtest:latest
+  #   container_name: Speedtest
+  #   environment:
+  #     - LOOP=true
+  #     - LOOP_DELAY=1800
+  #     - DB_SAVE=true
+  #     - DB_HOST=http://influxdb:8086
+  #     - DB_NAME=speedtest
+  #     - DB_USERNAME=${username}
+  #     - DB_PASSWORD=${password}
+  #   privileged: true # Needed for 'sleep' in the loop
+  #   depends_on:
+  #     - influxdb
+  #   restart: unless-stopped
+
+  # # Zigbee2mqtt
+  # zigbee2mqtt:
+  #   image: koenkk/zigbee2mqtt
+  #   container_name: zigbee2mqtt
+  #   ports:
+  #     # Frontend port
+  #     - 8080:8080
+  #   volumes:
+  #     - ${SmartHomeDir}/zigbee2mqtt:/app/data
+  #     - /run/udev:/run/udev:ro
+  #   environment:
+  #     - TZ=Europe/Amsterdam
+  #   devices:
+  #     # Make sure this matched your adapter location
+  #     - /dev/ttyAMA0:/dev/ttyACM0
+  #   depends_on:
+  #     - mosquitto
+  #   restart: unless-stopped
