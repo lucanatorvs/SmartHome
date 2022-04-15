@@ -8,19 +8,20 @@ You need a .env file with the following variables:
 
 ```
 variables yet to be added
+.env file not functional yet
 ```
 
 All the running docker containers should be:
 
-- [ ] [HomeAssistant](https://hub.docker.com/r/homeassistant/home-assistant) is integrated into the docker compose file
-- [ ] [Influxdb](https://hub.docker.com/_/influxdb) is integrated into the docker compose file
-- [ ] [Grafana](https://hub.docker.com/r/grafana/grafana) is integrated into the docker compose file
-- [ ] [Mosquitto](https://hub.docker.com/_/eclipse-mosquitto) is integrated into the docker compose file
+- [x] [HomeAssistant](https://hub.docker.com/r/homeassistant/home-assistant) is integrated into the docker compose file
+- [x] [Influxdb](https://hub.docker.com/_/influxdb) is integrated into the docker compose file
+- [x] [Grafana](https://hub.docker.com/r/grafana/grafana) is integrated into the docker compose file
+- [x] [Mosquitto](https://hub.docker.com/_/eclipse-mosquitto) is integrated into the docker compose file
 - [ ] [Speedtest](https://hub.docker.com/r/robinmanuelthiel/speedtest) is integrated into the docker compose file
 - [ ] [Zigbee2mqtt](https://hub.docker.com/r/koenkk/zigbee2mqtt) is integrated into the docker compose file
-- [ ] [Node-Red](https://hub.docker.com/r/nodered/node-red) is integrated into the docker compose file
+- [x] [Node-Red](https://hub.docker.com/r/nodered/node-red) is integrated into the docker compose file
 - [ ] [mqtt-bridge](mqtt2influxdb_bridge/Dockerfile) is integrated into the docker compose file
-- [ ] [Portainer](https://hub.docker.com/r/portainer/portainer-ce) is integrated into the docker compose file
+- [x] [Portainer](https://hub.docker.com/r/portainer/portainer-ce) is integrated into the docker compose file
 
 ## Usage
 
@@ -31,11 +32,12 @@ docker-compose down # stops the containers
 
 ## Todo
 
-- [ ] Create a docker compose file to deploy the home assistant instance and other components, such as a mqtt broker, Influxdb databace, Grafana and node-red.
-- [ ] Intigrate it with ikea TRÅDFRI lights and sensors, using a Zigbee CC2531 usb dongle.
-- [ ] Create custom sensors and lights to be controlled by the home assistant instance.
-- [ ] Create custom controll scripts to make my home work for me.
+- [x] Create a docker compose file to deploy the home assistant instance and other components, such as a mqtt broker, Influxdb databace, Grafana and node-red
+- [ ] add to the docker compose file to deploy the Zigbee2mqtt functionality
+- [ ] Intigrate it with ikea TRÅDFRI lights and sensors, using the above mentiond Zigbee CC2531 usb dongle
+- [ ] Create custom sensors and lights to be controlled by the home assistant instance
+- [ ] Create custom controll scripts to make my home work for me
 
-## What is not working / What needs to be fixt first
+## What is not working / What needs to be fixt first (ToDo)
 
-- [ ] 
+- [ ] Zigbee CC2531 usb dongle needs to be flashed with the firmware
