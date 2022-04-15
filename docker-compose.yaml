@@ -13,7 +13,7 @@ services:
     network_mode: host
     depends_on:
       - mosquitto
-    restart: unless-stopped
+    restart: always
 
   # Influxdb
   influxdb:
@@ -29,7 +29,7 @@ services:
       - INFLUXDB_ADMIN_PASSWORD=${password}
       - INFLUXDB_DB="speedtest"
       - INFLUXDB_DB="homeassistant"
-    restart: unless-stopped
+    restart: always
 
   # Grafana
   grafana:
@@ -42,7 +42,7 @@ services:
       - ${SmartHomeDir}/grafana:/var/lib/grafana
     depends_on:
       - influxdb
-    restart: unless-stopped
+    restart: always
     
   # Mosquitto
   mosquitto:
@@ -58,7 +58,7 @@ services:
     # environment:
     #   - MQTT_USERNAME=${username}
     #   - MQTT_PASSWORD=${password}
-    restart: unless-stopped
+    restart: always
 
   # Node-Red
   nodered:
@@ -75,7 +75,7 @@ services:
       - mosquitto
       - homeassistant
       - influxdb
-    restart: unless-stopped
+    restart: always
   
   # Portainer
   portainer:
@@ -94,7 +94,7 @@ services:
     environment:
       - PORT=9000
       - HOST=
-    restart: unless-stopped
+    restart: always
 
   # # mqtt-bridge
   # mqttbridge:
@@ -103,7 +103,7 @@ services:
   #   depends_on:
   #     - mosquitto
   #     - influxdb
-  #   restart: unless-stopped
+  #   restart: always
 
   # # Speedtest
   # speedtest:
@@ -120,7 +120,7 @@ services:
   #   privileged: true # Needed for 'sleep' in the loop
   #   depends_on:
   #     - influxdb
-  #   restart: unless-stopped
+  #   restart: always
 
   # # Zigbee2mqtt
   # zigbee2mqtt:
@@ -139,4 +139,4 @@ services:
   #     - /dev/ttyAMA0:/dev/ttyACM0
   #   depends_on:
   #     - mosquitto
-  #   restart: unless-stopped
+  #   restart: always
